@@ -7,10 +7,16 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class JerryConnector implements Connector,Runnable, LifeCycleSubject
 {
@@ -32,9 +38,11 @@ public class JerryConnector implements Connector,Runnable, LifeCycleSubject
 
     @Setter
     @Getter
-    private int timeOut;
+    private int timeOut=15000;
 
     private volatile boolean start=true;
+
+    private ExecutorService executorService=Executors.newCachedThreadPool();
 
     public JerryConnector()
     {
@@ -91,7 +99,8 @@ public class JerryConnector implements Connector,Runnable, LifeCycleSubject
                 if(timeOut>0)
                     socket.setSoTimeout(timeOut);
                 socket.setTcpNoDelay(true);
-
+                HttpProcess process=new HttpProcess(socket);
+                executorService.submit(process);
             }
             catch (IOException e) {
                 e.printStackTrace();
@@ -138,6 +147,13 @@ public class JerryConnector implements Connector,Runnable, LifeCycleSubject
         LifeCycleEvent event=new LifeCycleEvent(this,null,LifeCycleEnum.STOP);
         support.invokeLifeCycleListeners(event);
         start=false;
+        executorService.shutdownNow();
+        try {
+            serverSocket.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println("connector stop");
     }
 }

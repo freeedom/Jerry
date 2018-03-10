@@ -1,45 +1,79 @@
 package jerry.connector;
 
 import jerry.Request;
+import jerry.util.Enumerate;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.servlet.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Enumeration;
-import java.util.Locale;
-import java.util.Map;
+import java.net.Socket;
+import java.util.*;
 
 public class RequestImpl implements Request
 {
+    protected HashMap<String,String> headers=new HashMap<String, String>();
+
+    protected HashMap<String,Object> attrbutes=new HashMap<String, Object>();
+
+    protected HashMap<String,String> parameters=new HashMap<>();
+
+    protected String characterEncoding="UTF-8";
+
+    protected ArrayList<Byte> buffers=new ArrayList<Byte>(512);
+
+    protected String contentType;
+
+    protected Socket socket;
+
+    @Getter
+    @Setter
+    protected String protocol;
+
+    protected String scheme="HTTP";
+
+    public RequestImpl(Socket socket)
+    {
+        this.socket = socket;
+    }
+
     public Object getAttribute(String s)
     {
-        return null;
+        synchronized (this)
+        {
+            return attrbutes.get(s);
+        }
     }
 
     public Enumeration<String> getAttributeNames()
     {
-        return null;
+        synchronized (this)
+        {
+            return new Enumerate(attrbutes.keySet().iterator());
+        }
     }
 
     public String getCharacterEncoding()
     {
-        return null;
+        return characterEncoding;
     }
+
 
     public void setCharacterEncoding(String s) throws UnsupportedEncodingException
     {
-
+        characterEncoding=s;
     }
 
     public int getContentLength()
     {
-        return 0;
+        return buffers.size();
     }
 
     public String getContentType()
     {
-        return null;
+        return contentType;
     }
 
     public ServletInputStream getInputStream() throws IOException
@@ -49,42 +83,48 @@ public class RequestImpl implements Request
 
     public String getParameter(String s)
     {
-        return null;
+        return parameters.get(s);
     }
 
     public Enumeration<String> getParameterNames()
     {
-        return null;
+        return new Enumerate<String>(parameters.keySet().iterator());
     }
 
     public String[] getParameterValues(String s)
     {
-        return new String[0];
+        return (String[]) parameters.values().toArray();
     }
 
     public Map<String, String[]> getParameterMap()
     {
-        return null;
+        HashMap<String,String[]> temps=new HashMap<>(parameters.size());
+        parameters.keySet().stream().forEach(key->{
+            String[] s=new String[1];
+            s[0]=parameters.get(key);
+            temps.put(key,s);
+        });
+        return temps;
     }
 
     public String getProtocol()
     {
-        return null;
+        return protocol;
     }
 
     public String getScheme()
     {
-        return null;
+        return scheme;
     }
 
     public String getServerName()
     {
-        return null;
+        return "Jerry";
     }
 
     public int getServerPort()
     {
-        return 0;
+        return socket.getLocalPort();
     }
 
     public BufferedReader getReader() throws IOException
@@ -94,22 +134,22 @@ public class RequestImpl implements Request
 
     public String getRemoteAddr()
     {
-        return null;
+        return socket.getInetAddress().getHostAddress();
     }
 
     public String getRemoteHost()
     {
-        return null;
+        return socket.getInetAddress().getHostName();
     }
 
     public void setAttribute(String s, Object o)
     {
-
+        attrbutes.put(s,o);
     }
 
     public void removeAttribute(String s)
     {
-
+        attrbutes.remove(s);
     }
 
     public Locale getLocale()
@@ -139,22 +179,22 @@ public class RequestImpl implements Request
 
     public int getRemotePort()
     {
-        return 0;
+        return socket.getPort();
     }
 
     public String getLocalName()
     {
-        return null;
+        return socket.getLocalAddress().getHostName();
     }
 
     public String getLocalAddr()
     {
-        return null;
+        return socket.getLocalAddress().getHostAddress();
     }
 
     public int getLocalPort()
     {
-        return 0;
+        return socket.getLocalPort();
     }
 
     public ServletContext getServletContext()
