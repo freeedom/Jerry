@@ -28,8 +28,6 @@ public class RequestImpl implements Request
 
     protected Socket socket;
 
-    @Getter
-    @Setter
     protected String protocol;
 
     protected String scheme="HTTP";
@@ -38,6 +36,7 @@ public class RequestImpl implements Request
     {
         this.socket = socket;
     }
+
 
     public Object getAttribute(String s)
     {
@@ -230,5 +229,17 @@ public class RequestImpl implements Request
     public DispatcherType getDispatcherType()
     {
         return null;
+    }
+
+    @Override
+    public void setParameter(String key, String value)
+    {
+        parameters.put(key,value);
+    }
+
+    @Override
+    public void setProtocol(String protocol)
+    {
+        this.protocol=protocol;
     }
 }

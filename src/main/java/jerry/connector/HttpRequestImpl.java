@@ -22,8 +22,13 @@ public class HttpRequestImpl extends RequestImpl implements HttpRequest
 
     private HashMap<String,String> headers=new HashMap<>();
 
-    @Setter
     private String method;
+
+    private String queryString;
+
+    private String requestURI;
+
+    private String requestURL;
 
     protected SimpleDateFormat formats[] = {
             new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US),
@@ -240,5 +245,29 @@ public class HttpRequestImpl extends RequestImpl implements HttpRequest
     public Part getPart(String s) throws IOException, ServletException
     {
         return null;
+    }
+
+    @Override
+    public void setMethod(String method)
+    {
+        this.method=method;
+    }
+
+    @Override
+    public void setQueryString(String queryString)
+    {
+        this.queryString=queryString;
+    }
+
+    @Override
+    public void setRequestURI(String requestURI)
+    {
+        this.requestURI=requestURI;
+    }
+
+    @Override
+    public void setRequestURL(String requestURL)
+    {
+        this.requestURL=requestURL;
     }
 }
