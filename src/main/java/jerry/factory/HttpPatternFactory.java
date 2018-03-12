@@ -7,4 +7,8 @@ public interface HttpPatternFactory
     Pattern getRequestLinePattern();
 
     Pattern getParameterPattern();
+
+    Pattern getHeaderPattern();
+
+    Pattern getCookiePattern();
 }

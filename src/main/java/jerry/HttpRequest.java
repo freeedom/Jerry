@@ -1,5 +1,6 @@
 package jerry;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 public interface HttpRequest extends HttpServletRequest,Request
@@ -11,5 +12,9 @@ public interface HttpRequest extends HttpServletRequest,Request
     void setRequestURI(String requestURI);
 
     void setRequestURL(String requestURL);
+
+    void setHeader(String header,String value);
+
+    void setCookie(String key,String value);
 
 }

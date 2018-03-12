@@ -1,5 +1,6 @@
 package jerry.connector;
 
+import jerry.HttpRequest;
 import jerry.Request;
 
 import javax.servlet.ServletInputStream;
@@ -14,18 +15,28 @@ public class RequestStream extends ServletInputStream
 
     private int length;
 
-    private boolean close=false;
-
-
+    private int alreadyRead=0;
 
     public RequestStream(Request request) throws IOException
     {
         this.request = request;
-        this.socketInputStream=request.getInputStream();
+        this.socketInputStream=request.getSocket().getInputStream();
+        this.length=request.getContentLength();
     }
 
     public int read() throws IOException
     {
+        if(alreadyRead<length)
+        {
+            alreadyRead++;
+            return socketInputStream.read();
+        }
         return -1;
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+
     }
 }

@@ -14,7 +14,6 @@ import java.util.*;
 
 public class RequestImpl implements Request
 {
-    protected HashMap<String,String> headers=new HashMap<String, String>();
 
     protected HashMap<String,Object> attrbutes=new HashMap<String, Object>();
 
@@ -22,15 +21,17 @@ public class RequestImpl implements Request
 
     protected String characterEncoding="UTF-8";
 
-    protected ArrayList<Byte> buffers=new ArrayList<Byte>(512);
-
     protected String contentType;
+
+    protected int contentLength;
 
     protected Socket socket;
 
     protected String protocol;
 
     protected String scheme="HTTP";
+
+    protected ServletInputStream servletInputStream;
 
     public RequestImpl(Socket socket)
     {
@@ -67,7 +68,7 @@ public class RequestImpl implements Request
 
     public int getContentLength()
     {
-        return buffers.size();
+        return contentLength;
     }
 
     public String getContentType()
@@ -77,7 +78,17 @@ public class RequestImpl implements Request
 
     public ServletInputStream getInputStream() throws IOException
     {
-        return null;
+        if(servletInputStream==null)
+        {
+            synchronized (this)
+            {
+                if(servletInputStream==null)
+                {
+                    servletInputStream=new RequestStream(this);
+                }
+            }
+        }
+        return servletInputStream;
     }
 
     public String getParameter(String s)
@@ -241,5 +252,23 @@ public class RequestImpl implements Request
     public void setProtocol(String protocol)
     {
         this.protocol=protocol;
+    }
+
+    @Override
+    public void setContentLength(int contentLength)
+    {
+        this.contentLength=contentLength;
+    }
+
+    @Override
+    public void setContentType(String contentType)
+    {
+        this.contentType=contentType;
+    }
+
+    @Override
+    public Socket getSocket()
+    {
+        return this.socket;
     }
 }

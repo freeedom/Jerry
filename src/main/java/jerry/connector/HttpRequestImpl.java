@@ -1,6 +1,7 @@
 package jerry.connector;
 
 import jerry.HttpRequest;
+import jerry.HttpResponse;
 import jerry.util.Enumerate;
 import lombok.Setter;
 
@@ -36,10 +37,12 @@ public class HttpRequestImpl extends RequestImpl implements HttpRequest
             new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US)
     };
 
-    public HttpRequestImpl(Socket socket)
+    private HttpResponse httpResponse;
+
+    public HttpRequestImpl(Socket socket,HttpResponse httpResponse)
     {
         super(socket);
-
+        this.httpResponse=httpResponse;
     }
 
     @Override
@@ -51,7 +54,12 @@ public class HttpRequestImpl extends RequestImpl implements HttpRequest
     @Override
     public Cookie[] getCookies()
     {
-       return (Cookie[]) cookies.toArray();
+        Cookie[] cookiesArray=new Cookie[cookies.size()];
+        for(int i=0;i<cookies.size();i++)
+        {
+            cookiesArray[i]=cookies.get(i);
+        }
+        return cookiesArray;
     }
 
     @Override
@@ -136,7 +144,7 @@ public class HttpRequestImpl extends RequestImpl implements HttpRequest
     @Override
     public String getQueryString()
     {
-        return null;
+        return queryString;
     }
 
     @Override
@@ -166,13 +174,14 @@ public class HttpRequestImpl extends RequestImpl implements HttpRequest
     @Override
     public String getRequestURI()
     {
-        return null;
+        return requestURI;
     }
 
     @Override
     public StringBuffer getRequestURL()
     {
-        return null;
+        StringBuffer sb=new StringBuffer(requestURL);
+        return sb;
     }
 
     @Override
@@ -269,5 +278,18 @@ public class HttpRequestImpl extends RequestImpl implements HttpRequest
     public void setRequestURL(String requestURL)
     {
         this.requestURL=requestURL;
+    }
+
+    @Override
+    public void setHeader(String header, String value)
+    {
+        headers.put(header,value);
+    }
+
+    @Override
+    public void setCookie(String key,String value)
+    {
+        Cookie cookie=new Cookie(key,value);
+        cookies.add(cookie);
     }
 }

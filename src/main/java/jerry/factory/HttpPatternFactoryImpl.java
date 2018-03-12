@@ -10,6 +10,10 @@ public class HttpPatternFactoryImpl implements HttpPatternFactory
 
     Pattern parametersPattern;
 
+    Pattern headersPattern;
+
+    Pattern cookiePattern;
+
 
 
     private HttpPatternFactoryImpl(){}
@@ -40,6 +44,34 @@ public class HttpPatternFactoryImpl implements HttpPatternFactory
             }
         }
         return parametersPattern;
+    }
+
+    @Override
+    public Pattern getHeaderPattern()
+    {
+        if(headersPattern==null)
+        {
+            synchronized (this)
+            {
+                if(headersPattern==null)
+                    headersPattern=Pattern.compile("([^\\ :]*):\\ (.*)");
+            }
+        }
+        return headersPattern;
+    }
+
+    @Override
+    public Pattern getCookiePattern()
+    {
+        if(cookiePattern==null)
+        {
+            synchronized (this)
+            {
+                if(cookiePattern==null)
+                    cookiePattern=Pattern.compile("(?<name>[^= ]*)=(?<value>[^;]*)");
+            }
+        }
+        return cookiePattern;
     }
 
     public static HttpPatternFactory getHttpPatternFactory()

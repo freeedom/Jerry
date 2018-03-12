@@ -1,11 +1,14 @@
 package jerry.connector;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
 import jerry.HttpRequest;
 import jerry.factory.HttpPatternFactory;
 import jerry.factory.HttpPatternFactoryImpl;
 
+import javax.servlet.http.Cookie;
 import java.io.*;
 import java.net.Socket;
+import java.net.URLDecoder;
 import java.util.Enumeration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,39 +53,117 @@ public class HttpProcess implements Runnable
     {
         StringBuilder sb=new StringBuilder("");
         int ch=-1;
+        boolean isBlank=false;
+        int len=0;
         while((ch=socketInputStream.read())!=-1)
         {
-            if((char) ch=='\r') continue;
+            if((char) ch=='\r')
+            {
+                if(len==0) isBlank=true;
+                continue;
+            }
             else if((char) ch=='\n') break;
             sb.append((char) ch);
+            len++;
         }
+        if(isBlank) return "-1";
         return sb.toString();
+    }
+
+    String readPost(int len) throws IOException
+    {
+        byte[] chars=new byte[len];
+        socketInputStream.read(chars,0,len);
+        String s=new String(chars,0,len,httpRequest.getCharacterEncoding());
+        return URLDecoder.decode(s,httpRequest.getCharacterEncoding());
     }
     void parseRequest() throws IOException
     {
         parseRequestLine();
-        test();
+        parseHeader();
+        setHeaderAttribute();
+        testParseRequestLine();
+        testParseHeader();
+        System.out.println(httpRequest.getContentType());
+        System.out.println(readPost(httpRequest.getContentLength()));
     }
 
-    private void test()
+    void setHeaderAttribute()
+    {
+        if(httpRequest.getMethod().toUpperCase().equals("POST"))
+        {
+            String value=httpRequest.getHeader("Content-Type");
+            httpRequest.setContentType(value);
+            value=httpRequest.getHeader("Content-Length");
+            httpRequest.setContentLength(Integer.valueOf(value));
+        }
+    }
+
+
+    void parseHeader() throws IOException
+    {
+        String str="";
+        while ((str=readLine())!="")
+        {
+            //blank line
+            if(str=="-1")
+                break;
+            Pattern headerPattern=patternFactory.getHeaderPattern();
+            Matcher headerMatcher=headerPattern.matcher(str);
+            String header,value;
+            if(headerMatcher.find())
+            {
+                header=headerMatcher.group(1);
+                value=headerMatcher.group(2);
+                httpRequest.setHeader(header,value);
+                if(header.equals("Cookie"))
+                {
+                    Pattern cookiePattern=patternFactory.getCookiePattern();
+                    Matcher cookieMatcher=cookiePattern.matcher(value);
+                    String cookieKey,cookieValue;
+                    while(cookieMatcher.find())
+                    {
+                        cookieKey=cookieMatcher.group("name");
+                        cookieValue=cookieMatcher.group("value");
+                        httpRequest.setCookie(cookieKey,cookieValue);
+                    }
+                }
+            }
+        }
+    }
+
+    private void testParseHeader()
+    {
+        System.out.println("cookie------------");
+        Cookie[] cookies=httpRequest.getCookies();
+        System.out.println(cookies.length);
+        for(int i=0;i<cookies.length;i++)
+        {
+            System.out.println(cookies[i].getName()+"--"+cookies[i].getValue());
+        }
+        System.out.println("---------------------");
+       Enumeration<String> headerNames=  httpRequest.getHeaderNames();
+       while(headerNames.hasMoreElements())
+       {
+           String key=headerNames.nextElement();
+           String value=httpRequest.getHeader(key);
+           System.out.println(key+"--"+value);
+       }
+
+    }
+
+    private void testParseRequestLine()
     {
         //test requestLine
         System.out.println("method="+httpRequest.getMethod());
-        Enumeration<String> headerEnumeration= httpRequest.getHeaderNames();
-        while(headerEnumeration.hasMoreElements())
-        {
-            String header=headerEnumeration.nextElement();
-            System.out.println("header-------------------------");
-            System.out.println(header+"="+httpRequest.getHeader(header));
-        }
         if(httpRequest.getQueryString()!=null)
         {
             System.out.println("queryString="+httpRequest.getQueryString());
+            System.out.println("parameters-------------------------");
             Enumeration<String> parameterEnumerations= httpRequest.getParameterNames();
             while(parameterEnumerations.hasMoreElements())
             {
                 String header=parameterEnumerations.nextElement();
-                System.out.println("parameters-------------------------");
                 System.out.println(header+"="+httpRequest.getParameter(header));
             }
         }
@@ -108,6 +189,7 @@ public class HttpProcess implements Runnable
                     if(arg.contains("?"))
                     {
                         String queryString=arg.substring(arg.indexOf('?')+1);
+                        queryString=URLDecoder.decode(queryString,httpRequest.getCharacterEncoding());
                         arg=arg.substring(0,arg.indexOf('?'));
                         httpRequest.setQueryString(queryString);
                         Pattern parametersPattern=patternFactory.getParameterPattern();
