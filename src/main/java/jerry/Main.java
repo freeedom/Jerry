@@ -4,6 +4,7 @@ import jerry.connector.JerryConnector;
 import jerry.connector.RequestImpl;
 
 import javax.servlet.ServletRequest;
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 

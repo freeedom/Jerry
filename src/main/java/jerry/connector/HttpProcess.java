@@ -2,6 +2,7 @@ package jerry.connector;
 
 import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
 import jerry.HttpRequest;
+import jerry.HttpResponse;
 import jerry.factory.HttpPatternFactory;
 import jerry.factory.HttpPatternFactoryImpl;
 
@@ -32,6 +33,8 @@ public class HttpProcess implements Runnable
 
     private HttpRequest httpRequest;
 
+    private HttpResponse httpResponse;
+
     private HttpPatternFactory patternFactory= HttpPatternFactoryImpl.getHttpPatternFactory();
 
     private static final byte[] ack = (new String("HTTP/1.1 100 Continue\r\n\r\n")).getBytes();
@@ -47,6 +50,9 @@ public class HttpProcess implements Runnable
         socketInputStream=socket.getInputStream();
         socketOutputStream=socket.getOutputStream();
         httpRequest=new HttpRequestImpl(socket);
+        httpResponse=new HttpResponseImpl(socket);
+        httpRequest.setHttpResponse(httpResponse);
+        httpResponse.setHttpRequest(httpRequest);
     }
 
     String readLine() throws IOException
@@ -82,10 +88,8 @@ public class HttpProcess implements Runnable
         parseRequestLine();
         parseHeader();
         setHeaderAttribute();
-        testParseRequestLine();
-        testParseHeader();
-        System.out.println(httpRequest.getContentType());
-        System.out.println(readPost(httpRequest.getContentLength()));
+//        testParseRequestLine();
+//        testParseHeader();
     }
 
     void setHeaderAttribute()

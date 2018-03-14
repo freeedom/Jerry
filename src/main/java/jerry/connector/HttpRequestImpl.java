@@ -39,10 +39,9 @@ public class HttpRequestImpl extends RequestImpl implements HttpRequest
 
     private HttpResponse httpResponse;
 
-    public HttpRequestImpl(Socket socket,HttpResponse httpResponse)
+    public HttpRequestImpl(Socket socket)
     {
         super(socket);
-        this.httpResponse=httpResponse;
     }
 
     @Override
@@ -291,5 +290,11 @@ public class HttpRequestImpl extends RequestImpl implements HttpRequest
     {
         Cookie cookie=new Cookie(key,value);
         cookies.add(cookie);
+    }
+
+    @Override
+    public void setHttpResponse(HttpResponse httpResponse)
+    {
+        this.httpResponse=httpResponse;
     }
 }

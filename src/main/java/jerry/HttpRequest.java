@@ -17,4 +17,6 @@ public interface HttpRequest extends HttpServletRequest,Request
 
     void setCookie(String key,String value);
 
+    void setHttpResponse(HttpResponse httpResponse);
+
 }

@@ -1,5 +1,6 @@
 package jerry.connector;
 
+import jerry.HttpResponse;
 import jerry.Response;
 
 import javax.servlet.ServletOutputStream;
@@ -20,6 +21,8 @@ public class ResponseStream extends ServletOutputStream
 
     private int start=0;
 
+    private boolean writeHeader=false;
+
     public ResponseStream(Response response) throws IOException
     {
         this.response = response;
@@ -31,6 +34,11 @@ public class ResponseStream extends ServletOutputStream
     @Override
     public void write(int b) throws IOException
     {
+        if(!writeHeader)
+        {
+            writeHeader=true;
+
+        }
         if((cur+1)%bufferSize!=start)
         {
             buffers[cur++]= (byte) b;
@@ -58,5 +66,25 @@ public class ResponseStream extends ServletOutputStream
     public void close() throws IOException
     {
         flush();
+    }
+
+    private void writeHeaders()
+    {
+        HttpResponse httpResponse= (HttpResponse) response;
+        StringBuilder sb=new StringBuilder("");
+        int s=httpResponse.getStatus();
+        HttpStatus  status=HttpStatus.getHttpStatus(s);
+        sb.append("HTTP/1.1 "+status.getStatus()+" "+status.getName()+"\r\n");
+        for (String headerName : httpResponse.getHeaderNames()) {
+            String value=httpResponse.getHeader(headerName);
+            sb.append(headerName+": "+value+"\r\n");
+        }
+        sb.append("\r\n");
+        try {
+            socketOutputStream.write(sb.toString().getBytes(response.getCharacterEncoding()));
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

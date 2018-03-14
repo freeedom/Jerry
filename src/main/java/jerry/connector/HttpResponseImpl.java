@@ -19,13 +19,14 @@ public class HttpResponseImpl extends ResponseImpl implements HttpResponse
 
     private Map<String,String> headers=new HashMap<>(16);
 
+    private int status=200;
+
     protected final SimpleDateFormat format =
             new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz",Locale.US);
 
-    public HttpResponseImpl(Socket socket,HttpRequest httpRequest)
+    public HttpResponseImpl(Socket socket)
     {
         super(socket);
-        this.httpRequest=httpRequest;
     }
 
     @Override
@@ -128,19 +129,19 @@ public class HttpResponseImpl extends ResponseImpl implements HttpResponse
     @Override
     public void setStatus(int i)
     {
-
+        this.status=i;
     }
 
     @Override
     public void setStatus(int i, String s)
     {
-
+        this.status=i;
     }
 
     @Override
     public int getStatus()
     {
-        return 0;
+        return status;
     }
 
     @Override
@@ -161,5 +162,11 @@ public class HttpResponseImpl extends ResponseImpl implements HttpResponse
     public Collection<String> getHeaderNames()
     {
         return headers.keySet();
+    }
+
+    @Override
+    public void setHttpRequest(HttpRequest httpRequest)
+    {
+        this.httpRequest=httpRequest;
     }
 }
