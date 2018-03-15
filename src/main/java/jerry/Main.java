@@ -16,5 +16,6 @@ public class Main
         ((LifeCycleSubject)connector).start();
         System.in.read();
         ((LifeCycleSubject)connector).stop();
+
     }
 }

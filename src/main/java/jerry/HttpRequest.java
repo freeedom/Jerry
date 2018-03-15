@@ -19,4 +19,6 @@ public interface HttpRequest extends HttpServletRequest,Request
 
     void setHttpResponse(HttpResponse httpResponse);
 
+    void setContextPath(String contextPath);
+
 }

@@ -1,16 +1,14 @@
 package jerry.connector;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
 import jerry.HttpRequest;
 import jerry.HttpResponse;
 import jerry.factory.HttpPatternFactory;
 import jerry.factory.HttpPatternFactoryImpl;
+import jerry.test.TestHeader;
 
-import javax.servlet.http.Cookie;
 import java.io.*;
 import java.net.Socket;
 import java.net.URLDecoder;
-import java.util.Enumeration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -88,9 +86,9 @@ public class HttpProcess implements Runnable
         parseRequestLine();
         parseHeader();
         setHeaderAttribute();
-//        testParseRequestLine();
-//        testParseHeader();
     }
+
+
 
     void setHeaderAttribute()
     {
@@ -100,6 +98,22 @@ public class HttpProcess implements Runnable
             httpRequest.setContentType(value);
             value=httpRequest.getHeader("Content-Length");
             httpRequest.setContentLength(Integer.valueOf(value));
+        }
+        String requestURL="http://"+httpRequest.getHeader("Host")+httpRequest.getRequestURI();
+        httpRequest.setRequestURL(requestURL);
+        //http://localhost:8080/servlet/bird
+        //http://sdafdsa.com/bird
+        String requestURI=httpRequest.getRequestURI();
+        if(requestURI.lastIndexOf("/")==0)
+        {
+            httpRequest.setContextPath("");
+        }
+        else
+        {
+            int firstIndex=requestURI.indexOf("/");
+            int secondIndex=requestURI.indexOf("/",firstIndex+1);
+            String contextPath=requestURI.substring(firstIndex+1,secondIndex);
+            httpRequest.setContextPath(contextPath);
         }
     }
 
@@ -136,44 +150,6 @@ public class HttpProcess implements Runnable
         }
     }
 
-    private void testParseHeader()
-    {
-        System.out.println("cookie------------");
-        Cookie[] cookies=httpRequest.getCookies();
-        System.out.println(cookies.length);
-        for(int i=0;i<cookies.length;i++)
-        {
-            System.out.println(cookies[i].getName()+"--"+cookies[i].getValue());
-        }
-        System.out.println("---------------------");
-       Enumeration<String> headerNames=  httpRequest.getHeaderNames();
-       while(headerNames.hasMoreElements())
-       {
-           String key=headerNames.nextElement();
-           String value=httpRequest.getHeader(key);
-           System.out.println(key+"--"+value);
-       }
-
-    }
-
-    private void testParseRequestLine()
-    {
-        //test requestLine
-        System.out.println("method="+httpRequest.getMethod());
-        if(httpRequest.getQueryString()!=null)
-        {
-            System.out.println("queryString="+httpRequest.getQueryString());
-            System.out.println("parameters-------------------------");
-            Enumeration<String> parameterEnumerations= httpRequest.getParameterNames();
-            while(parameterEnumerations.hasMoreElements())
-            {
-                String header=parameterEnumerations.nextElement();
-                System.out.println(header+"="+httpRequest.getParameter(header));
-            }
-        }
-        System.out.println(httpRequest.getProtocol());
-
-    }
 
     void parseRequestLine() throws IOException
     {
@@ -206,6 +182,7 @@ public class HttpProcess implements Runnable
                         }
                     }
                     httpRequest.setRequestURI(arg);
+
                     break;
                 case 2:
                     httpRequest.setProtocol(arg);

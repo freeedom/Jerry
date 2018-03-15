@@ -31,6 +31,8 @@ public class HttpRequestImpl extends RequestImpl implements HttpRequest
 
     private String requestURL;
 
+    private String contextPath;
+
     protected SimpleDateFormat formats[] = {
             new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US),
             new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
@@ -137,7 +139,7 @@ public class HttpRequestImpl extends RequestImpl implements HttpRequest
     @Override
     public String getContextPath()
     {
-        return null;
+        return contextPath;
     }
 
     @Override
@@ -296,5 +298,11 @@ public class HttpRequestImpl extends RequestImpl implements HttpRequest
     public void setHttpResponse(HttpResponse httpResponse)
     {
         this.httpResponse=httpResponse;
+    }
+
+    @Override
+    public void setContextPath(String contextPath)
+    {
+        this.contextPath=contextPath;
     }
 }
