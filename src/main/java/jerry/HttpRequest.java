@@ -21,4 +21,8 @@ public interface HttpRequest extends HttpServletRequest,Request
 
     void setContextPath(String contextPath);
 
+    void setServletContainer(ServletContainer servletContainer);
+
+    ServletContainer getServletContainer();
+
 }

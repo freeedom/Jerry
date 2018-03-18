@@ -1,12 +1,8 @@
 package jerry;
 
-public interface Mapper
+public interface Contained
 {
-    String getInfo();
-
     Container getContainer();
 
     void setContainer(Container container);
-
-    Container map(HttpRequest request);
 }

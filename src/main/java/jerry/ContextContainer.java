@@ -18,5 +18,7 @@ public interface ContextContainer extends Container
 
     String[] getServletMappings();
 
+    String findServletContainerMapping(String pattern);
+
 
 }

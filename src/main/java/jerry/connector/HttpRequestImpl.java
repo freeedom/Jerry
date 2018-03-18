@@ -2,6 +2,7 @@ package jerry.connector;
 
 import jerry.HttpRequest;
 import jerry.HttpResponse;
+import jerry.ServletContainer;
 import jerry.util.Enumerate;
 import lombok.Setter;
 
@@ -40,6 +41,8 @@ public class HttpRequestImpl extends RequestImpl implements HttpRequest
     };
 
     private HttpResponse httpResponse;
+
+    private ServletContainer servletContainer;
 
     public HttpRequestImpl(Socket socket)
     {
@@ -304,5 +307,17 @@ public class HttpRequestImpl extends RequestImpl implements HttpRequest
     public void setContextPath(String contextPath)
     {
         this.contextPath=contextPath;
+    }
+
+    @Override
+    public void setServletContainer(ServletContainer servletContainer)
+    {
+        this.servletContainer=servletContainer;
+    }
+
+    @Override
+    public ServletContainer getServletContainer()
+    {
+        return servletContainer;
     }
 }
