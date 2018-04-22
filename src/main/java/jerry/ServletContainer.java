@@ -6,5 +6,5 @@ public interface ServletContainer extends Container
 
     void setServletClass(String servletClass);
 
-    void load();
+    void load() throws IllegalAccessException, InstantiationException;
 }

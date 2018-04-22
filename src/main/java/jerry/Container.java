@@ -1,7 +1,9 @@
 package jerry;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public interface Container
 {
@@ -21,7 +23,7 @@ public interface Container
 
     Container getParent();
 
-    void invoke(HttpServletRequest request, HttpServletResponse response);
+    void invoke(HttpServletRequest request, HttpServletResponse response) ;
 
     void setLoader(Loader loader);
 

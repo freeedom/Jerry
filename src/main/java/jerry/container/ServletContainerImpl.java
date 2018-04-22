@@ -6,8 +6,11 @@ import jerry.Loader;
 import jerry.ServletContainer;
 
 import javax.servlet.Servlet;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public class ServletContainerImpl implements ServletContainer
 {
@@ -23,6 +26,8 @@ public class ServletContainerImpl implements ServletContainer
     private String servletClassName;
 
     private Loader loader;
+
+    private boolean isLoad=false;
 
     @Override
     public String getInfo()
@@ -75,7 +80,32 @@ public class ServletContainerImpl implements ServletContainer
     @Override
     public void invoke(HttpServletRequest request, HttpServletResponse response)
     {
-
+        if(isLoad==false)
+        {
+            try {
+                load();
+                servlet.init(null);
+            }
+            catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            catch (InstantiationException e) {
+                e.printStackTrace();
+            }
+            catch (ServletException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            servlet.service(request,response);
+            response.flushBuffer();
+        }
+        catch (ServletException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -89,8 +119,10 @@ public class ServletContainerImpl implements ServletContainer
     {
         if(loader!=null)
             return loader;
-        if(contextContainer!=null)
-            return contextContainer.getLoader();
+        if(contextContainer!=null) {
+            loader = contextContainer.getLoader();
+            return loader;
+        }
         return null;
     }
 
@@ -113,8 +145,16 @@ public class ServletContainerImpl implements ServletContainer
     }
 
     @Override
-    public void load()
+    public void load() throws IllegalAccessException, InstantiationException
     {
-
+        Loader tempLoader=getLoader();
+        ClassLoader classLoader=tempLoader.getClassLoader();
+        try {
+            servlet= (Servlet) classLoader.loadClass(getServletClass()).newInstance();
+        }
+        catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
+
 }

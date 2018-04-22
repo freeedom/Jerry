@@ -1,6 +1,7 @@
 package jerry.container;
 
 import jerry.*;
+import jerry.valves.BasicValve;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -8,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ContextContainerImpl implements Container, ContextContainer
+public class ContextContainerImpl implements Container, ContextContainer,Chain
 {
     public static final String info="jerry.container.ContextContainerImpl";
 
@@ -20,15 +21,48 @@ public class ContextContainerImpl implements Container, ContextContainer
 
     private ArrayList<Container> containers=new ArrayList<>();
 
-    private Chain chain=new ChainImpl(this);
-
     private Mapper mapper=new MapperImpl(this);
+
+    private ArrayList<Valve> valves=new ArrayList<>();
+
+    private Loader loader;
 
     @Override
     public String getInfo()
     {
         return info;
     }
+
+    @Override
+    public Valve getBasicValve()
+    {
+        return null;
+    }
+
+    @Override
+    public void setBasicValve(Valve valve)
+    {
+
+    }
+
+    @Override
+    public void addValve(Valve valve)
+    {
+        valves.add(valve);
+    }
+
+    @Override
+    public Valve[] getValves()
+    {
+        return (Valve[]) valves.toArray();
+    }
+
+    @Override
+    public void invoke(HttpRequest httpRequest, HttpResponse httpResponse)
+    {
+
+    }
+
 
     @Override
     public String getName()
@@ -75,21 +109,23 @@ public class ContextContainerImpl implements Container, ContextContainer
     @Override
     public void invoke(HttpServletRequest request, HttpServletResponse response)
     {
-        chain.invoke((HttpRequest)request,(HttpResponse)response);
         Container servletContainer= mapper.map((HttpRequest) request);
-
+        Valve basicValve=new BasicValve(servletContainer);
+        Chain chain=new ChainImpl(this);
+        chain.setBasicValve(basicValve);
+        chain.invoke((HttpRequest)request,(HttpResponse)response);
     }
 
     @Override
     public void setLoader(Loader loader)
     {
-
+        this.loader=loader;
     }
 
     @Override
     public Loader getLoader()
     {
-        return null;
+        return loader;
     }
 
     @Override

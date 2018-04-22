@@ -47,8 +47,8 @@ public class JerryLoader implements Loader
                     for(int i=0;i<repositories.size();i++)
                     {
                         urls[i]=repositoryToURL(repositories.get(i));
-                        classLoader=new URLClassLoader(urls);
                     }
+                    classLoader=new URLClassLoader(urls);
                 }
             }
         }

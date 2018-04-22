@@ -37,7 +37,7 @@ public class ResponseStream extends ServletOutputStream
         if(!writeHeader)
         {
             writeHeader=true;
-
+            writeHeaders();
         }
         if((cur+1)%bufferSize!=start)
         {

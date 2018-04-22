@@ -203,7 +203,6 @@ public class HttpProcess implements Runnable, Contained
         try {
             parseRequest();
             container.invoke(httpRequest,httpResponse);
-            //TODO
         }
         catch (IOException e) {
             e.printStackTrace();

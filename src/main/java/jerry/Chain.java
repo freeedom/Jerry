@@ -12,5 +12,5 @@ public interface Chain
 
     Valve[] getValves();
 
-    void invoke(HttpRequest httpRequest,HttpResponse httpResponse);
+    void invoke(HttpRequest httpRequest, HttpResponse httpResponse);
 }
