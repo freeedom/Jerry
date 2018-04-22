@@ -1,5 +1,7 @@
 package jerry.connector;
 
+import jerry.Contained;
+import jerry.Container;
 import jerry.HttpRequest;
 import jerry.HttpResponse;
 import jerry.factory.HttpPatternFactory;
@@ -12,7 +14,7 @@ import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HttpProcess implements Runnable
+public class HttpProcess implements Runnable, Contained
 {
 
     private static final String info="httpProcess";
@@ -35,6 +37,8 @@ public class HttpProcess implements Runnable
 
     private HttpPatternFactory patternFactory= HttpPatternFactoryImpl.getHttpPatternFactory();
 
+    private Container container;
+
     private static final byte[] ack = (new String("HTTP/1.1 100 Continue\r\n\r\n")).getBytes();
 
     private static final byte[] CRLF = (new String("\r\n")).getBytes();
@@ -42,7 +46,7 @@ public class HttpProcess implements Runnable
 
 
 
-    public HttpProcess(Socket socket) throws IOException
+    public HttpProcess(Socket socket,Container container) throws IOException
     {
         this.socket = socket;
         socketInputStream=socket.getInputStream();
@@ -51,6 +55,7 @@ public class HttpProcess implements Runnable
         httpResponse=new HttpResponseImpl(socket);
         httpRequest.setHttpResponse(httpResponse);
         httpResponse.setHttpRequest(httpRequest);
+        this.container=container;
     }
 
     String readLine() throws IOException
@@ -197,6 +202,8 @@ public class HttpProcess implements Runnable
     {
         try {
             parseRequest();
+            container.invoke(httpRequest,httpResponse);
+            //TODO
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -212,4 +219,15 @@ public class HttpProcess implements Runnable
     }
 
 
+    @Override
+    public Container getContainer()
+    {
+        return container;
+    }
+
+    @Override
+    public void setContainer(Container container)
+    {
+        this.container=container;
+    }
 }

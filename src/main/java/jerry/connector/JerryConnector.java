@@ -100,8 +100,9 @@ public class JerryConnector implements Connector,Runnable, LifeCycleSubject
                 if(timeOut>0)
                     socket.setSoTimeout(timeOut);
                 socket.setTcpNoDelay(true);
-                HttpProcess process=new HttpProcess(socket);
-                executorService.submit(process);
+                HttpProcess process=new HttpProcess(socket,container);
+//                executorService.submit(process);
+                process.run();
             }
             catch (IOException e) {
                 e.printStackTrace();

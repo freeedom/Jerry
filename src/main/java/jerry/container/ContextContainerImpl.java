@@ -1,8 +1,6 @@
 package jerry.container;
 
-import jerry.Container;
-import jerry.ContextContainer;
-import jerry.Loader;
+import jerry.*;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +19,10 @@ public class ContextContainerImpl implements Container, ContextContainer
     private HashMap<String,String> patternMap=new HashMap<>();
 
     private ArrayList<Container> containers=new ArrayList<>();
+
+    private Chain chain=new ChainImpl(this);
+
+    private Mapper mapper=new MapperImpl(this);
 
     @Override
     public String getInfo()
@@ -73,6 +75,8 @@ public class ContextContainerImpl implements Container, ContextContainer
     @Override
     public void invoke(HttpServletRequest request, HttpServletResponse response)
     {
+        chain.invoke((HttpRequest)request,(HttpResponse)response);
+        Container servletContainer= mapper.map((HttpRequest) request);
 
     }
 
