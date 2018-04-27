@@ -1,29 +1,32 @@
 package jerry.container;
 
+import com.sun.xml.internal.bind.v2.TODO;
 import jerry.*;
 import jerry.valves.BasicValve;
+import jerry.valves.ErrorValve;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.nio.channels.Channel;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ContextContainerImpl implements Container, ContextContainer,Chain
+public class ContextContainerImpl implements Container, ContextContainer, Chain
 {
-    public static final String info="jerry.container.ContextContainerImpl";
+    public static final String info = "jerry.container.ContextContainerImpl";
 
     private String contextName;
 
     private String contextPath;
 
-    private HashMap<String,String> patternMap=new HashMap<>();
+    private HashMap<String, String> patternMap = new HashMap<>();
 
-    private ArrayList<Container> containers=new ArrayList<>();
+    private ArrayList<Container> containers = new ArrayList<>();
 
-    private Mapper mapper=new MapperImpl(this);
+    private Mapper mapper = new MapperImpl(this);
 
-    private ArrayList<Valve> valves=new ArrayList<>();
+    private ArrayList<Valve> valves = new ArrayList<>();
 
     private Loader loader;
 
@@ -73,7 +76,7 @@ public class ContextContainerImpl implements Container, ContextContainer,Chain
     @Override
     public void setName(String name)
     {
-        this.contextName=name;
+        this.contextName = name;
     }
 
     @Override
@@ -85,7 +88,7 @@ public class ContextContainerImpl implements Container, ContextContainer,Chain
     @Override
     public Container getChild(String name)
     {
-       return  containers.stream().filter(container -> container.getName().equals(name) ).findFirst().get();
+        return containers.stream().filter(container -> container.getName().equals(name)).findFirst().get();
     }
 
     @Override
@@ -109,17 +112,32 @@ public class ContextContainerImpl implements Container, ContextContainer,Chain
     @Override
     public void invoke(HttpServletRequest request, HttpServletResponse response)
     {
-        Container servletContainer= mapper.map((HttpRequest) request);
-        Valve basicValve=new BasicValve(servletContainer);
-        Chain chain=new ChainImpl(this);
-        chain.setBasicValve(basicValve);
-        chain.invoke((HttpRequest)request,(HttpResponse)response);
+        Container servletContainer = mapper.map((HttpRequest) request);
+        Chain chain = new ChainImpl(this);
+        if (servletContainer != null) {
+            Valve basicValve = new BasicValve(servletContainer);
+            chain.setBasicValve(basicValve);
+        }
+        for (Valve valve : valves) {
+            chain.addValve(valve);
+        }
+        if (servletContainer == null)
+        {
+            chain.addValve(new ErrorValve());
+        }
+        chain.invoke((HttpRequest) request, (HttpResponse) response);
+//        else
+//        {
+//            // TODO 静态资源的处理，找不到资源返回404，明天写配置注解部分，反射创建main函数
+//
+//        }
+
     }
 
     @Override
     public void setLoader(Loader loader)
     {
-        this.loader=loader;
+        this.loader = loader;
     }
 
     @Override
@@ -143,7 +161,7 @@ public class ContextContainerImpl implements Container, ContextContainer,Chain
     @Override
     public void setContextPath(String contextPath)
     {
-        this.contextPath=contextPath;
+        this.contextPath = contextPath;
     }
 
     @Override
@@ -167,7 +185,7 @@ public class ContextContainerImpl implements Container, ContextContainer,Chain
     @Override
     public void addServletMapping(String pattern, String servletName)
     {
-        patternMap.put(pattern,servletName);
+        patternMap.put(pattern, servletName);
     }
 
     @Override
@@ -179,8 +197,7 @@ public class ContextContainerImpl implements Container, ContextContainer,Chain
     @Override
     public String findServletContainerMapping(String pattern)
     {
-        synchronized (this)
-        {
+        synchronized (this) {
             return patternMap.get(pattern);
         }
     }

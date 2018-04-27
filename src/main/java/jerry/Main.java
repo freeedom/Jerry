@@ -5,6 +5,7 @@ import jerry.connector.RequestImpl;
 import jerry.container.ContextContainerImpl;
 import jerry.container.ServletContainerImpl;
 import jerry.loader.JerryLoader;
+import jerry.valves.StaticResourceValve;
 
 import javax.servlet.ServletRequest;
 import java.io.File;
@@ -21,6 +22,8 @@ public class Main
         Loader loader=new JerryLoader();
         loader.addRepository("/home/jmt/IdeaProjects/Jerry/webroot");
         container.setLoader(loader);
+        ((Chain)container).addValve(new StaticResourceValve(container));
+
 
         ServletContainer firstServletContainer=new ServletContainerImpl();
         firstServletContainer.setName("firstServlet");
@@ -30,10 +33,10 @@ public class Main
         ((ContextContainer)container).addServletMapping("/haha/first","firstServlet");
 
         ServletContainer hello=new ServletContainerImpl();
-        firstServletContainer.setName("helloServlet");
-        firstServletContainer.setServletClass("Two");
-        firstServletContainer.setParent(container);
-        container.addChild(firstServletContainer);
+        hello.setName("helloServlet");
+        hello.setServletClass("Two");
+        hello.setParent(container);
+        container.addChild(hello);
         ((ContextContainer)container).addServletMapping("/hello","helloServlet");
 
 

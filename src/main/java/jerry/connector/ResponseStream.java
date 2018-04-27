@@ -29,16 +29,17 @@ public class ResponseStream extends ServletOutputStream
         this.socketOutputStream=response.getSocket().getOutputStream();
         this.bufferSize=response.getBufferSize();
         this.buffers=new byte[bufferSize];
+        writeHeaders();
     }
 
     @Override
     public void write(int b) throws IOException
     {
-        if(!writeHeader)
-        {
-            writeHeader=true;
-            writeHeaders();
-        }
+//        if(!writeHeader)
+//        {
+//            writeHeader=true;
+//            writeHeaders();
+//        }
         if((cur+1)%bufferSize!=start)
         {
             buffers[cur++]= (byte) b;
