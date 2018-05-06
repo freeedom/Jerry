@@ -1,8 +1,10 @@
 package jerry.container;
 
 import jerry.*;
+import jerry.util.URLUtil;
 
 import java.sql.Wrapper;
+import java.util.List;
 
 public class MapperImpl implements Mapper
 {
@@ -63,6 +65,22 @@ public class MapperImpl implements Mapper
                 int index = relativeURI.lastIndexOf('/');
                 if (index < 0) break;
                 relativeURI = relativeURI.substring(0, index);
+            }
+        }
+
+        if (servletContainer == null) {
+            relativeURI = request.getRequestURI().substring(contextPath.length()+1);
+            List<String> urlList=URLUtil.splitUrl(relativeURI);
+            urlList.add("/");
+            for(int i=0;i<urlList.size();i++)
+            {
+                name = container.findServletContainerMapping(urlList.get(i));
+                if (name != null) {
+                    servletContainer = (ServletContainer) container.getChild(name);
+                }
+                if (servletContainer != null) {
+                    break;
+                }
             }
         }
         return servletContainer;

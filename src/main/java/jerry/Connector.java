@@ -17,6 +17,7 @@ public interface Connector
 
     void init();
 
+    void setPort(int port);
 
 
 }

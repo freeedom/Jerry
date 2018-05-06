@@ -27,8 +27,6 @@ public class JerryConnector implements Connector,Runnable, LifeCycleSubject
 
     private jerry.factory.ServerSocketFactory serverSocketFactory;
 
-    @Getter
-    @Setter
     private int port=8080;
 
     private ServerSocket serverSocket;
@@ -37,8 +35,6 @@ public class JerryConnector implements Connector,Runnable, LifeCycleSubject
 
     private Thread thread;
 
-    @Setter
-    @Getter
     private int timeOut=15000;
 
     private volatile boolean start=true;
@@ -88,6 +84,12 @@ public class JerryConnector implements Connector,Runnable, LifeCycleSubject
         catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void setPort(int port)
+    {
+        this.port=port;
     }
 
     public void run()

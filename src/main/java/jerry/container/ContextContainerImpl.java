@@ -126,11 +126,6 @@ public class ContextContainerImpl implements Container, ContextContainer, Chain
             chain.addValve(new ErrorValve());
         }
         chain.invoke((HttpRequest) request, (HttpResponse) response);
-//        else
-//        {
-//            // TODO 静态资源的处理，找不到资源返回404，明天写配置注解部分，反射创建main函数
-//
-//        }
 
     }
 

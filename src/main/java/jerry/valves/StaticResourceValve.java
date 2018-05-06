@@ -26,7 +26,6 @@ public class StaticResourceValve implements Valve
         String url = httpRequest.getRequestURI();
         int index = url.indexOf(httpRequest.getContextPath());
         String streamUrl = "resources" + url.substring(index + httpRequest.getContextPath().length());
-        System.out.println(streamUrl);
         InputStream stream = loader.getClassLoader().getResourceAsStream(streamUrl);
         if (stream != null) {
             OutputStream outputStream = null;

@@ -83,7 +83,7 @@ public class ChainImpl implements Chain, Contained
         @Override
         public String getInfo()
         {
-            return null;
+            return info;
         }
 
         @Override
