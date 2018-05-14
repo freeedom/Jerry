@@ -2,6 +2,7 @@ package jerry.loader;
 
 import jerry.Container;
 import jerry.Loader;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +15,8 @@ import java.util.stream.Collectors;
 
 public class JerryLoader implements Loader
 {
+    private static Logger logger = Logger.getLogger(JerryLoader.class);
+
     private static final String info="jerryLoader";
 
     private ClassLoader classLoader=null;
@@ -26,6 +29,7 @@ public class JerryLoader implements Loader
     {
         String webroot=System.getProperty("user.dir")+ File.separator+"webroot/classes";
         addRepository(webroot);
+        logger.debug(info+" start");
     }
 
     @Override

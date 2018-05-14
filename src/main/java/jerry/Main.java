@@ -9,6 +9,7 @@ import jerry.parse.ParseXml;
 import jerry.parse.WebAppBean;
 import jerry.loader.JerryLoader;
 import jerry.util.URLUtil;
+import jerry.valves.LogValve;
 import jerry.valves.StaticResourceValve;
 
 import java.io.IOException;
@@ -30,6 +31,7 @@ public class Main
 //        loader.addRepository("/home/jmt/IdeaProjects/Jerry/webroot");
         loader.addRepository(contextBean.getWebroot());
         container.setLoader(loader);
+        ((Chain) container).addValve(new LogValve());
         ((Chain) container).addValve(new StaticResourceValve(container));
 
         Map<String, String> nameClassMap = contextBean.getServletNameClassMap();

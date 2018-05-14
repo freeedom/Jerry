@@ -63,12 +63,12 @@ public class MapperImpl implements Mapper
                     break;
                 }
                 int index = relativeURI.lastIndexOf('/');
-                if (index < 0) break;
+                if (index < 0 || relativeURI.indexOf('.')!=-1) break;
                 relativeURI = relativeURI.substring(0, index);
             }
         }
 
-        if (servletContainer == null) {
+        if (servletContainer == null && request.getRequestURI().indexOf('.')==-1) {
             relativeURI = request.getRequestURI().substring(contextPath.length()+1);
             List<String> urlList=URLUtil.splitUrl(relativeURI);
             urlList.add("/");

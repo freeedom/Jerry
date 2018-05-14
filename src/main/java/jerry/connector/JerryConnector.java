@@ -6,6 +6,7 @@ import jerry.factory.ServerSocketFactoryImpl;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.log4j.Logger;
 
 import javax.servlet.ServletOutputStream;
 import java.io.BufferedReader;
@@ -21,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 public class JerryConnector implements Connector,Runnable, LifeCycleSubject
 {
+    private static Logger logger = Logger.getLogger(JerryConnector.class);
+
     private static final String info="jerry.connector.JerryConnector";
 
     private Container container;
@@ -59,7 +62,7 @@ public class JerryConnector implements Connector,Runnable, LifeCycleSubject
     public void setContainer(Container container)
     {
         this.container=container;
-
+        logger.debug(info+" start");
     }
 
     public ServerSocketFactory getServerSocketFactory()
@@ -103,22 +106,11 @@ public class JerryConnector implements Connector,Runnable, LifeCycleSubject
                     socket.setSoTimeout(timeOut);
                 socket.setTcpNoDelay(true);
                 HttpProcess process=new HttpProcess(socket,container);
-//                executorService.submit(process);
-                process.run();
+                executorService.submit(process);
+//                process.run();
             }
             catch (IOException e) {
-                e.printStackTrace();
-            }
-            finally {
-                if(socket!=null)
-                {
-                    try {
-                        socket.close();
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+                logger.error("",e);
             }
         }
         if(serverSocket!=null)
@@ -153,7 +145,8 @@ public class JerryConnector implements Connector,Runnable, LifeCycleSubject
         thread=new Thread(this,"JerryConnecter thread");
         thread.setDaemon(true);
         thread.start();
-        System.out.println("connector start");
+//        System.out.println("connector start");
+        logger.debug("connector start");
         support.invokeLifeCycleListeners(event);
     }
 
@@ -169,6 +162,7 @@ public class JerryConnector implements Connector,Runnable, LifeCycleSubject
         catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("connector stop");
+//        System.out.println("connector stop");
+        logger.debug("connector stop");
     }
 }

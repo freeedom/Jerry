@@ -1,5 +1,6 @@
 package jerry.parse;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -10,6 +11,7 @@ import java.io.*;
 
 public class ParseXml
 {
+    private static Logger logger = Logger.getLogger(ParseXml.class);
     public static WebAppBean parse(String fileName)
     {
         WebAppBean webAppBean=null;
@@ -21,20 +23,23 @@ public class ParseXml
             Node webApp = document.getChildNodes().item(0);
             NodeList contexts = webApp.getChildNodes();
             webAppBean = new WebAppBean();
+            logger.debug("----------------server.xml---------------");
             for (int i = 0; i < contexts.getLength(); i++) {
-                webAppBean.addContextBean(parseContext(contexts.item(i)));
+                ContextBean bean=parseContext(contexts.item(i));
+                webAppBean.addContextBean(bean);
+                logger.debug(bean.toString());
             }
             rmTmpXml(fileName);
             return webAppBean;
         }
         catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            logger.error("解析错误",e);
         }
         catch (SAXException e) {
             e.printStackTrace();
         }
         catch (IOException e) {
-            e.printStackTrace();
+            logger.error("配置文件加载错误",e);
         }
         return webAppBean;
     }

@@ -4,6 +4,7 @@ import com.sun.xml.internal.bind.v2.TODO;
 import jerry.*;
 import jerry.valves.BasicValve;
 import jerry.valves.ErrorValve;
+import org.apache.log4j.Logger;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +15,8 @@ import java.util.HashMap;
 
 public class ContextContainerImpl implements Container, ContextContainer, Chain
 {
+    private static Logger logger = Logger.getLogger(ContextContainerImpl.class);
+
     public static final String info = "jerry.container.ContextContainerImpl";
 
     private String contextName;
@@ -29,6 +32,11 @@ public class ContextContainerImpl implements Container, ContextContainer, Chain
     private ArrayList<Valve> valves = new ArrayList<>();
 
     private Loader loader;
+
+    public ContextContainerImpl()
+    {
+        logger.debug(info+" start");
+    }
 
     @Override
     public String getInfo()

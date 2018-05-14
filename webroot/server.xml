@@ -3,12 +3,12 @@
     <context name="jerry" port="80" debug="info">
         <webroot>/home/jmt/IdeaProjects/Jerry/webroot/</webroot>
         <servlet>
-            <servlet-name>FirstServlet</servlet-name>
-            <servlet-class>Two</servlet-class>
+            <servlet-name>first</servlet-name>
+            <servlet-class>FirstServlet</servlet-class>
         </servlet>
         <servlet-mapping>
-            <servlet-name>FirstServlet</servlet-name>
-            <url-pattern>/*</url-pattern>
+            <servlet-name>first</servlet-name>
+            <url-pattern>/first</url-pattern>
         </servlet-mapping>
     </context>
 </web-app>

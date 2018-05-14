@@ -70,4 +70,10 @@ public class ContextBean
     {
         servletNameUrlMap.put(servletName,urlPattern);
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("contextName:%s\nport:%s\nwebroot:%s\n",name,port,webroot);
+    }
 }
